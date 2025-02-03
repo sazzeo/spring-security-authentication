@@ -20,7 +20,7 @@ public class LoginController {
         this.memberRepository = memberRepository;
     }
 
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public ResponseEntity<Void> login(HttpServletRequest request, HttpSession session) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         String username = parameterMap.get("username")[0];
