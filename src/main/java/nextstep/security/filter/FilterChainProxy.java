@@ -18,7 +18,7 @@ public class FilterChainProxy extends GenericFilterBean {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        new VirtualFilterChain(securityFilterChains.get(0).getFilters(), chain);
-        chain.doFilter(request, response);
+        var virtualFilterChain = new VirtualFilterChain(securityFilterChains.get(0).getFilters(), chain);
+        virtualFilterChain.doFilter(request, response);
     }
 }
