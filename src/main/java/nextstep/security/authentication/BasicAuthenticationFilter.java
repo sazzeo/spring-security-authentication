@@ -17,10 +17,10 @@ import java.io.IOException;
 
 public class BasicAuthenticationFilter extends GenericFilterBean {
 
-    private final UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
-    public BasicAuthenticationFilter(final UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public BasicAuthenticationFilter(final AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -42,9 +42,8 @@ public class BasicAuthenticationFilter extends GenericFilterBean {
             String username = usernameAndPassword[0];
             String password = usernameAndPassword[1];
 
-            var userDetails = userDetailsService.findUserDetailsByPrincipal(username);
-            var match = userDetails.match(password);
-            if (!match) {
+            var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
+            if (!authentication.isAuthenticated()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }

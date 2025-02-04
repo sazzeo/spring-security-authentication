@@ -39,7 +39,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain() {
         List<GenericFilterBean> filters = List.of(
-                new BasicAuthenticationFilter(userDetailsService),
+                new BasicAuthenticationFilter(authenticationManager()),
                 new LoginAuthenticationFilter(authenticationManager()));
         return new DefaultSecurityFilterChain(filters);
     }

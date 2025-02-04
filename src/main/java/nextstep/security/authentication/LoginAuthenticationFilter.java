@@ -36,7 +36,6 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
             String username = parameterMap.get("username")[0];
             String password = parameterMap.get("password")[0];
 
-
             var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
             if (!authentication.isAuthenticated()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
