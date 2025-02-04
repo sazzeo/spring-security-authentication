@@ -6,6 +6,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import nextstep.security.context.SecurityContextHolder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
@@ -14,7 +15,6 @@ import java.io.IOException;
 import java.util.Map;
 
 public class LoginAuthenticationFilter extends GenericFilterBean {
-    public static final String SPRING_SECURITY_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT";
     private final AuthenticationManager authenticationManager;
 
     public LoginAuthenticationFilter(final AuthenticationManager authenticationManager) {
@@ -41,11 +41,13 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
-
-            httpServletRequest.getSession().setAttribute(SPRING_SECURITY_CONTEXT_KEY, authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             httpServletResponse.setStatus(HttpStatus.OK.value());
+            chain.doFilter(request, response);
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+        } finally {
+            SecurityContextHolder.clearContext();
         }
     }
 

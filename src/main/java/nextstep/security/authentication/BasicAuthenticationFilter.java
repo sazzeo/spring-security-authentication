@@ -6,7 +6,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import nextstep.security.service.UserDetailsService;
+import nextstep.security.context.SecurityContextHolder;
 import nextstep.security.util.Base64Convertor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,9 +30,11 @@ public class BasicAuthenticationFilter extends GenericFilterBean {
             chain.doFilter(request, response);
             return;
         }
-
         var authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-
+        if(authorization == null) {
+            chain.doFilter(request, response);
+            return;
+        }
         var httpServletResponse = (HttpServletResponse) response;
         try {
 
@@ -43,13 +45,17 @@ public class BasicAuthenticationFilter extends GenericFilterBean {
             String password = usernameAndPassword[1];
 
             var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
+
             if (!authentication.isAuthenticated()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
+        } finally {
+            SecurityContextHolder.clearContext();
         }
         chain.doFilter(request, response);
 

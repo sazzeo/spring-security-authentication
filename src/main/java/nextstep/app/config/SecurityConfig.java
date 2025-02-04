@@ -1,6 +1,9 @@
 package nextstep.app.config;
 
 import nextstep.security.authentication.*;
+import nextstep.security.context.HttpSessionSecurityContextRepository;
+import nextstep.security.context.SecurityContextHolderFilter;
+import nextstep.security.context.SecurityContextRepository;
 import nextstep.security.filter.DefaultSecurityFilterChain;
 import nextstep.security.filter.FilterChainProxy;
 import nextstep.security.filter.SecurityFilterChain;
@@ -37,10 +40,17 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain() {
         List<GenericFilterBean> filters = List.of(
                 new BasicAuthenticationFilter(authenticationManager()),
-                new LoginAuthenticationFilter(authenticationManager()));
+                new LoginAuthenticationFilter(authenticationManager()),
+                new SecurityContextHolderFilter(securityContextRepository())
+        );
         return new DefaultSecurityFilterChain(filters);
     }
 
