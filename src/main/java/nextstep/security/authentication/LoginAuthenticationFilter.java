@@ -6,7 +6,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import nextstep.security.service.UserDetailsService;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
@@ -16,10 +15,10 @@ import java.util.Map;
 
 public class LoginAuthenticationFilter extends GenericFilterBean {
     public static final String SPRING_SECURITY_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT";
-    private final UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
-    public LoginAuthenticationFilter(final UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public LoginAuthenticationFilter(final AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -36,13 +35,15 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
             Map<String, String[]> parameterMap = request.getParameterMap();
             String username = parameterMap.get("username")[0];
             String password = parameterMap.get("password")[0];
-            var userDetails = userDetailsService.findUserDetailsByPrincipal(username);
-            var match = userDetails.match(password);
-            if (!match) {
+
+
+            var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
+            if (!authentication.isAuthenticated()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
-            httpServletRequest.getSession().setAttribute(SPRING_SECURITY_CONTEXT_KEY, userDetails);
+
+            httpServletRequest.getSession().setAttribute(SPRING_SECURITY_CONTEXT_KEY, authentication);
             httpServletResponse.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());

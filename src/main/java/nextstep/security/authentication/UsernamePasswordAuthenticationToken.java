@@ -20,7 +20,6 @@ public class UsernamePasswordAuthenticationToken implements Authentication {
         return new UsernamePasswordAuthenticationToken(principal, credentials, true);
     }
 
-
     @Override
     public Object getPrincipal() {
         return this.principal;

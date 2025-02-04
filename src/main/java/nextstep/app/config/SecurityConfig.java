@@ -1,7 +1,6 @@
 package nextstep.app.config;
 
-import nextstep.security.authentication.BasicAuthenticationFilter;
-import nextstep.security.authentication.LoginAuthenticationFilter;
+import nextstep.security.authentication.*;
 import nextstep.security.filter.DefaultSecurityFilterChain;
 import nextstep.security.filter.FilterChainProxy;
 import nextstep.security.filter.SecurityFilterChain;
@@ -21,23 +20,6 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-//    @Bean
-//    public FilterRegistrationBean<Filter> basicAuthenticationFilter() {
-//        FilterRegistrationBean<Filter> bean = new FilterRegistrationBean<>();
-//        bean.setFilter(new BasicAuthenticationFilter(userDetailsService));
-//        bean.setOrder(1);
-//        bean.addUrlPatterns("/members");
-//        return bean;
-//    }
-//
-//    @Bean
-//    public FilterRegistrationBean<Filter> LoginAuthenticationFilter() {
-//        FilterRegistrationBean<Filter> bean = new FilterRegistrationBean<>();
-//        bean.setFilter(new LoginAuthenticationFilter(userDetailsService));
-//        bean.setOrder(2);
-//        bean.addUrlPatterns("/login");
-//        return bean;
-//    }
 
     @Bean
     public DelegatingFilterProxy delegatingFilterProxy() {
@@ -50,14 +32,16 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(List.of(new DaoAuthenticationProvider(userDetailsService)));
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain() {
-        List<GenericFilterBean> filters =  List.of(
+        List<GenericFilterBean> filters = List.of(
                 new BasicAuthenticationFilter(userDetailsService),
-                new LoginAuthenticationFilter(userDetailsService)
-        );
-        return new DefaultSecurityFilterChain(
-                filters
-        );
+                new LoginAuthenticationFilter(authenticationManager()));
+        return new DefaultSecurityFilterChain(filters);
     }
 
 }
