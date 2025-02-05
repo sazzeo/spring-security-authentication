@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -79,13 +80,12 @@ class FormLoginTest {
     @Test
     void user_login_after_members() throws Exception {
         MockHttpSession session = new MockHttpSession();
-
         ResultActions loginResponse = mockMvc.perform(post("/login")
                 .param("username", TEST_MEMBER.getEmail())
                 .param("password", TEST_MEMBER.getPassword())
                 .session(session)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        );
+        ).andDo(print());
 
         loginResponse.andExpect(status().isOk());
 
@@ -94,6 +94,6 @@ class FormLoginTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
         );
 
-        membersResponse.andExpect(status().isForbidden());
+        membersResponse.andExpect(status().isOk());
     }
 }

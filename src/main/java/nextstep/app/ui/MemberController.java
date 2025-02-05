@@ -29,10 +29,6 @@ public class MemberController {
             throw new AuthorizationException();
         }
 
-        var member = memberRepository.findByEmail((String) session.getAuthentication().getPrincipal())
-                .orElseThrow(AuthenticationException::new);
-
-        //현재 인가 기능이 없어서 무조건 인가 에러 반환하도록 구현
-        throw new AuthorizationException();
+        return ResponseEntity.ok(memberRepository.findAll());
     }
 }
