@@ -1,18 +1,14 @@
 package nextstep.security.filter;
 
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.io.IOException;
 import java.util.List;
 
-public abstract class SecurityFilterChain implements FilterChain {
+public interface SecurityFilterChain {
 
-    @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response) throws IOException, ServletException {
-        new VirtualFilterChain(getFilters(), this);
-    }
+    List<Filter> getFilters();
 
-    abstract List<Filter> getFilters();
-
+    boolean matches(HttpServletRequest request);
 
 }

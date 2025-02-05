@@ -1,13 +1,13 @@
 package nextstep.security.filter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class FilterChainProxy extends GenericFilterBean {
     private final List<SecurityFilterChain> securityFilterChains;
@@ -18,7 +18,19 @@ public class FilterChainProxy extends GenericFilterBean {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        var virtualFilterChain = new VirtualFilterChain(securityFilterChains.get(0).getFilters(), chain);
+        List<Filter> filters = getFilters((HttpServletRequest) request);
+        var virtualFilterChain = new VirtualFilterChain(filters, chain);
         virtualFilterChain.doFilter(request, response);
     }
+
+    private List<Filter> getFilters(HttpServletRequest request) {
+        Optional<SecurityFilterChain> filters = securityFilterChains.stream()
+                .filter(it -> it.matches(request))
+                .findFirst();
+        if(filters.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return filters.get().getFilters();
+    }
+
 }
