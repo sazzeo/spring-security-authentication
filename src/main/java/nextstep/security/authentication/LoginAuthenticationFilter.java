@@ -7,6 +7,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.context.SecurityContextHolder;
+import nextstep.security.util.request.HttpRequestMatcher;
+import nextstep.security.util.request.RequestMatcher;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
@@ -16,16 +18,23 @@ import java.util.Map;
 
 public class LoginAuthenticationFilter extends GenericFilterBean {
     private final AuthenticationManager authenticationManager;
+    private final RequestMatcher requestMatcher;
 
     public LoginAuthenticationFilter(final AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
+        this.requestMatcher = new HttpRequestMatcher(HttpMethod.POST, "/login");
+    }
+
+    public LoginAuthenticationFilter(final AuthenticationManager authenticationManager, final RequestMatcher requestMatcher) {
+        this.authenticationManager = authenticationManager;
+        this.requestMatcher = requestMatcher;
     }
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         var httpServletRequest = (HttpServletRequest) request;
 
-        if (!httpServletRequest.getMethod().equals(HttpMethod.POST.name())) {
+        if (!requestMatcher.matches(httpServletRequest)) {
             chain.doFilter(request, response);
             return;
         }
