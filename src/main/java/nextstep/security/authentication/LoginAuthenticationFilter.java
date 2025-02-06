@@ -43,11 +43,8 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
             }
             SecurityContextHolder.getContext().setAuthentication(authentication);
             httpServletResponse.setStatus(HttpStatus.OK.value());
-            chain.doFilter(request, response);
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-        } finally {
-            SecurityContextHolder.clearContext();
         }
     }
 

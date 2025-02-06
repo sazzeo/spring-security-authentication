@@ -49,8 +49,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain() {
         List<GenericFilterBean> filters = List.of(
                 new BasicAuthenticationFilter(authenticationManager()),
-                new LoginAuthenticationFilter(authenticationManager()),
-                new SecurityContextHolderFilter(securityContextRepository())
+                new SecurityContextHolderFilter(securityContextRepository()),
+                new LoginAuthenticationFilter(authenticationManager())
         );
         return new DefaultSecurityFilterChain(filters, new AllPassRequestMatcher());
     }

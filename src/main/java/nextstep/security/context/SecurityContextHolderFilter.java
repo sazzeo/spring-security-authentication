@@ -24,12 +24,7 @@ public class SecurityContextHolderFilter extends GenericFilterBean {
         var httpServletResponse = (HttpServletResponse) response;
         var context = securityContextRepository.loadContext(httpServletRequest);
         SecurityContextHolder.setContext(context);
-
-        if (httpServletRequest.getRequestURI().equals("/login")) {
-            return;
-        }
         chain.doFilter(request, response);
-
         securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
         SecurityContextHolder.clearContext();
 
