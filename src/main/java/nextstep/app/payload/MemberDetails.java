@@ -1,7 +1,7 @@
 package nextstep.app.payload;
 
 import nextstep.app.domain.Member;
-import nextstep.security.service.UserDetails;
+import nextstep.security.userdetails.UserDetails;
 
 public class MemberDetails implements UserDetails {
 

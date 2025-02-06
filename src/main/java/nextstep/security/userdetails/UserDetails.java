@@ -1,4 +1,4 @@
-package nextstep.security.service;
+package nextstep.security.userdetails;
 
 public interface UserDetails {
     Object getPrincipal();

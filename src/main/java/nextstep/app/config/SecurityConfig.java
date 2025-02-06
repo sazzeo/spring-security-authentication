@@ -7,7 +7,7 @@ import nextstep.security.context.SecurityContextRepository;
 import nextstep.security.filter.DefaultSecurityFilterChain;
 import nextstep.security.filter.FilterChainProxy;
 import nextstep.security.filter.SecurityFilterChain;
-import nextstep.security.service.UserDetailsService;
+import nextstep.security.userdetails.UserDetailsService;
 import nextstep.security.util.request.AllPassRequestMatcher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
