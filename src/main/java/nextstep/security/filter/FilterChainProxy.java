@@ -24,13 +24,11 @@ public class FilterChainProxy extends GenericFilterBean {
     }
 
     private List<Filter> getFilters(HttpServletRequest request) {
-        Optional<SecurityFilterChain> filters = securityFilterChains.stream()
+        return securityFilterChains.stream()
                 .filter(it -> it.matches(request))
-                .findFirst();
-        if(filters.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return filters.get().getFilters();
+                .findFirst()
+                .map(SecurityFilterChain::getFilters)
+                .orElse(Collections.emptyList());
     }
 
 }
