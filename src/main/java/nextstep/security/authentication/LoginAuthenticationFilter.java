@@ -6,6 +6,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import nextstep.security.authentication.convertor.AuthenticationConvertor;
+import nextstep.security.authentication.convertor.UsernamePasswordParameterConvertor;
 import nextstep.security.context.SecurityContextHolder;
 import nextstep.security.util.request.HttpRequestMatcher;
 import nextstep.security.util.request.RequestMatcher;
@@ -14,26 +16,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class LoginAuthenticationFilter extends GenericFilterBean {
     private final AuthenticationManager authenticationManager;
-    private final RequestMatcher requestMatcher;
+    private RequestMatcher requestMatcher;
+    private AuthenticationConvertor authenticationConvertor;
 
     public LoginAuthenticationFilter(final AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         this.requestMatcher = new HttpRequestMatcher(HttpMethod.POST, "/login");
-    }
-
-    public LoginAuthenticationFilter(final AuthenticationManager authenticationManager, final RequestMatcher requestMatcher) {
-        this.authenticationManager = authenticationManager;
-        this.requestMatcher = requestMatcher;
+        this.authenticationConvertor = new UsernamePasswordParameterConvertor();
     }
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         var httpServletRequest = (HttpServletRequest) request;
-
         if (!requestMatcher.matches(httpServletRequest)) {
             chain.doFilter(request, response);
             return;
@@ -41,11 +38,8 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
         var httpServletResponse = (HttpServletResponse) response;
 
         try {
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            String username = parameterMap.get("username")[0];
-            String password = parameterMap.get("password")[0];
-
-            var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
+            var unauthenticatedToken = authenticationConvertor.convert(httpServletRequest);
+            var authentication = authenticationManager.authenticate(unauthenticatedToken);
             if (!authentication.isAuthenticated()) {
                 httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
@@ -55,6 +49,14 @@ public class LoginAuthenticationFilter extends GenericFilterBean {
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
+    }
+
+    public void setRequestMatcher(final RequestMatcher requestMatcher) {
+        this.requestMatcher = requestMatcher;
+    }
+
+    public void setAuthenticationConvertor(final AuthenticationConvertor authenticationConvertor) {
+        this.authenticationConvertor = authenticationConvertor;
     }
 
 }
