@@ -35,7 +35,7 @@ class BasicAuthTest {
         memberRepository.save(TEST_MEMBER);
     }
 
-    @DisplayName("Basic Auth 인증 성공 후 회원 목록 조회")
+    @DisplayName("Basic Auth GET 요청 인증 성공 후 회원 목록 조회")
     @Test
     void members() throws Exception {
         String token = TEST_MEMBER.getEmail() + ":" + TEST_MEMBER.getPassword();

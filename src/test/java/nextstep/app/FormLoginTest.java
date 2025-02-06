@@ -76,7 +76,7 @@ class FormLoginTest {
         response.andExpect(status().isUnauthorized());
     }
 
-    @DisplayName("일반 회원은 회원 목록 조회 불가능")
+    @DisplayName("로그인한 회원은 목록 조회 가능")
     @Test
     void user_login_after_members() throws Exception {
         MockHttpSession session = new MockHttpSession();

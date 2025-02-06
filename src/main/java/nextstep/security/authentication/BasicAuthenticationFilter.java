@@ -6,8 +6,13 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.RemoteEndpoint;
+import nextstep.app.ui.AuthenticationException;
+import nextstep.security.authentication.convertor.AuthenticationConvertor;
+import nextstep.security.authentication.convertor.BasicAuthenticationConvertor;
 import nextstep.security.context.SecurityContextHolder;
 import nextstep.security.util.Base64Convertor;
+import nextstep.security.util.string.ColonSeparatedParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -18,47 +23,39 @@ import java.io.IOException;
 public class BasicAuthenticationFilter extends GenericFilterBean {
 
     private final AuthenticationManager authenticationManager;
+    private final AuthenticationConvertor authenticationConvertor;
 
     public BasicAuthenticationFilter(final AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
+        this.authenticationConvertor = new BasicAuthenticationConvertor();
     }
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         var httpServletRequest = (HttpServletRequest) request;
-        if (!httpServletRequest.getMethod().equals(HttpMethod.GET.name())) {
-            chain.doFilter(request, response);
-            return;
-        }
-        var authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        if(authorization == null) {
-            chain.doFilter(request, response);
-            return;
-        }
         var httpServletResponse = (HttpServletResponse) response;
         try {
-
-            var credentials = authorization.split(" ")[1];
-            String decodedString = Base64Convertor.decode(credentials);
-            String[] usernameAndPassword = decodedString.split(":");
-            String username = usernameAndPassword[0];
-            String password = usernameAndPassword[1];
-
-            var authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
-
-            if (!authentication.isAuthenticated()) {
-                httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-                return;
-            }
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            doFilterInternal(httpServletRequest, httpServletResponse);
         } catch (Exception e) {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
-        } finally {
-            SecurityContextHolder.clearContext();
         }
         chain.doFilter(request, response);
+    }
 
+    private void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response) {
+        var usernamePassword = authenticationConvertor.convert(request);
+        if (usernamePassword == null) {
+            return;
+        }
+
+        var unauthenticatedToken = authenticationConvertor.convert(request);
+        var authentication = authenticationManager.authenticate(unauthenticatedToken);
+        if (!authentication.isAuthenticated()) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
 }
