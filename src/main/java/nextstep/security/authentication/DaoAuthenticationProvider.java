@@ -14,7 +14,7 @@ public class DaoAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(final Authentication authentication) {
         var userDetails = userDetailsService.findUserDetailsByPrincipal(authentication.getPrincipal());
         if (!userDetails.match(authentication.getCredentials())) {
             return UsernamePasswordAuthenticationToken.unauthenticated(authentication.getPrincipal(), authentication.getCredentials());
