@@ -8,6 +8,7 @@ import nextstep.security.filter.DefaultSecurityFilterChain;
 import nextstep.security.filter.FilterChainProxy;
 import nextstep.security.filter.SecurityFilterChain;
 import nextstep.security.service.UserDetailsService;
+import nextstep.security.util.request.AllPassRequestMatcher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.DelegatingFilterProxy;
@@ -51,7 +52,7 @@ public class SecurityConfig {
                 new LoginAuthenticationFilter(authenticationManager()),
                 new SecurityContextHolderFilter(securityContextRepository())
         );
-        return new DefaultSecurityFilterChain(filters);
+        return new DefaultSecurityFilterChain(filters, new AllPassRequestMatcher());
     }
 
 }
