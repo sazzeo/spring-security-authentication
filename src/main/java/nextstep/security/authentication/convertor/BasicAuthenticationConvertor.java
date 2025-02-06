@@ -1,7 +1,7 @@
 package nextstep.security.authentication.convertor;
 
 import jakarta.servlet.http.HttpServletRequest;
-import nextstep.app.ui.AuthenticationException;
+import nextstep.security.exceptions.AuthenticationException;
 import nextstep.security.authentication.Authentication;
 import nextstep.security.authentication.UsernamePasswordAuthenticationToken;
 import nextstep.security.util.Base64Convertor;

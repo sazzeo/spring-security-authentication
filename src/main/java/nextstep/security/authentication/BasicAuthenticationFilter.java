@@ -6,15 +6,9 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.websocket.RemoteEndpoint;
-import nextstep.app.ui.AuthenticationException;
 import nextstep.security.authentication.convertor.AuthenticationConvertor;
 import nextstep.security.authentication.convertor.BasicAuthenticationConvertor;
 import nextstep.security.context.SecurityContextHolder;
-import nextstep.security.util.Base64Convertor;
-import nextstep.security.util.string.ColonSeparatedParser;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 

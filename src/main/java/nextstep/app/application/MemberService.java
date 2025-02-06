@@ -2,7 +2,7 @@ package nextstep.app.application;
 
 import nextstep.app.domain.MemberRepository;
 import nextstep.app.payload.MemberDetails;
-import nextstep.app.ui.AuthenticationException;
+import nextstep.security.exceptions.AuthenticationException;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 

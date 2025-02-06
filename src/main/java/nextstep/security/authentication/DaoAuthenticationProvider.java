@@ -1,6 +1,5 @@
 package nextstep.security.authentication;
 
-import nextstep.app.ui.AuthenticationException;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
